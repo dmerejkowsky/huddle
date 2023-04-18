@@ -17,6 +17,7 @@ public class Storage {
     public Storage(String url) {
         try {
             connection = DriverManager.getConnection(url);
+            connection.setAutoCommit(false);
         } catch (SQLException e) {
             throw new RuntimeException("When connecting: " + e);
         }
@@ -36,12 +37,14 @@ public class Storage {
 
     public void reInit() {
         System.out.format("reInit(): Using connection %s\n", connection.toString());
-        String initSql = "CREATE TABLE foos(id INTEGER PRIMAKRY KEY);";
-        String fuSql = readInitSql();
-        //System.out.println(fuSql);
+        String initSql = readInitSql();
         try {
             var statement = connection.createStatement();
-            statement.execute(fuSql);
+            statement.execute(initSql);
+            statement.execute("""
+                    INSERT INTO foos(BAR) VALUES ("pouet");
+                """);
+            connection.commit();
         } catch (SQLException e) {
             throw new RuntimeException("When running init.sql: " + e);
         }
@@ -193,14 +196,19 @@ public class Storage {
         return res;
     }
 
-    public void readFoos() throws SQLException {
+    public List<String> readFoos() throws SQLException {
+        var res = new ArrayList<String>();
         System.out.format("readFoos(): using connection %s\n", connection.toString());
 
         var sql = """
-            SELECT id FROM foos
+            SELECT bar FROM foos
             """;
         var statement = connection.prepareStatement(sql);
         var resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            res.add(resultSet.getString(1));
+        }
 
+        return res;
     }
 }

@@ -11,58 +11,26 @@ public class StorageTests {
 
     public static Storage inMemory() {
         var res = new Storage("jdbc:sqlite:huddle.sqlite");
-        res.reInit();
         return res;
     }
 
     @Test
-    void read_foos1() throws SQLException {
-        var storage = new Storage("jdbc:sqlite::memory:");
-        String initSql = """
-            CREATE TABLE foos(
-                id INTEGER PRIMARY KEY NOT NULL
-                );
-            """;
-        var statement1 = storage.connection.createStatement();
-        statement1.execute(initSql);
-        System.out.println("I ran init.sql");
-
-
-        var sql = """
-            SELECT id FROM foos
-            """;
-        var statement = storage.connection.prepareStatement(sql);
-        var resultSet = statement.executeQuery();
-
-    }
-
-    @Test
-    void read_foos2() throws SQLException {
-        var storage = new Storage("jdbc:sqlite::memory:");
+    void read_foos() throws SQLException {
+        var storage = inMemory();
         storage.reInit();
-
-        var sql = """
-            SELECT id FROM foos
-            """;
-        var statement = storage.connection.prepareStatement(sql);
-        var resultSet = statement.executeQuery();
-
+        var foos = storage.readFoos();
+        System.out.format("foos: %s", foos.toString());
     }
 
     @Test
     void insert_account() throws SQLException {
         var storage = inMemory();
         var account = new AccountCreationRequest("bob", "bob@domain.tld");
-        storage.readFoos();
-
-        /*
         storage.createAccount(account);
 
         var found = storage.getAccountByUserName("bob");
         assertThat(found.username()).isEqualTo("bob");
         assertThat(found.email()).isEqualTo("bob@domain.tld");
-
-         */
     }
 
     @Test

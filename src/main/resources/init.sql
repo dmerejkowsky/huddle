@@ -3,7 +3,6 @@ CREATE TABLE foos(
   id INTEGER PRIMARY KEY NOT NULL
 );
 
-/*
 DROP TABLE IF EXISTS accounts;
 CREATE TABLE accounts(
    id INTEGER PRIMARY KEY NOT NULL,
@@ -23,4 +22,4 @@ CREATE TABLE participants(
    account_id INTEGER NOT NULL,
    huddle_id INTEGER NOT NULL
 );
-*/
+
