@@ -1,0 +1,19 @@
+DROP TABLE IF EXISTS accounts;
+CREATE TABLE accounts(
+   id INTEGER PRIMARY KEY NOT NULL,
+   username TEXT NOT NULL UNIQUE,
+   email TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS huddles;
+CREATE TABLE huddles(
+   id INTEGER PRIMARY KEY NOT NULL,
+   date TEXT NOT NULL UNIQUE,
+   title TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS participants;
+CREATE TABLE participants(
+   account_id INTEGER NOT NULL,
+   huddle_id INTEGER NOT NULL
+);
