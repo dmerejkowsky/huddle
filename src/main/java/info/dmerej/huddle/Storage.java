@@ -3,13 +3,16 @@ package info.dmerej.huddle;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Storage {
-    private final Connection connection;
+    public final Connection connection;
 
     public Storage(String url) {
         try {
@@ -17,8 +20,6 @@ public class Storage {
         } catch (SQLException e) {
             throw new RuntimeException("When connecting: " + e);
         }
-
-        migrate();
     }
 
     private static String readInitSql() {
@@ -33,20 +34,17 @@ public class Storage {
         return sql;
     }
 
-    public void migrate() {
-        String initSql = readInitSql();
+    public void reInit() {
+        System.out.format("reInit(): Using connection %s\n", connection.toString());
+        String initSql = "CREATE TABLE foos(id INTEGER PRIMAKRY KEY);";
+        String fuSql = readInitSql();
+        //System.out.println(fuSql);
         try {
-            Statement statement = getStatement();
-            statement.execute(initSql);
+            var statement = connection.createStatement();
+            statement.execute(fuSql);
         } catch (SQLException e) {
-            throw new RuntimeException("When creating table: " + e);
+            throw new RuntimeException("When running init.sql: " + e);
         }
-    }
-
-    private Statement getStatement() throws SQLException {
-
-        var statement = connection.createStatement();
-        return statement;
     }
 
     public Account createAccount(AccountCreationRequest request) {
@@ -195,4 +193,14 @@ public class Storage {
         return res;
     }
 
+    public void readFoos() throws SQLException {
+        System.out.format("readFoos(): using connection %s\n", connection.toString());
+
+        var sql = """
+            SELECT id FROM foos
+            """;
+        var statement = connection.prepareStatement(sql);
+        var resultSet = statement.executeQuery();
+
+    }
 }

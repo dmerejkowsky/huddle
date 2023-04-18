@@ -1,37 +1,74 @@
 package info.dmerej.huddle;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class StorageTests {
-    private Storage storage;
 
     public static Storage inMemory() {
-        var res = new Storage("jdbc:h2:mem");
-        res.migrate();
+        var res = new Storage("jdbc:sqlite:huddle.sqlite");
+        res.reInit();
         return res;
     }
 
-    @BeforeEach
-    void setUp() {
-        storage = inMemory();
+    @Test
+    void read_foos1() throws SQLException {
+        var storage = new Storage("jdbc:sqlite::memory:");
+        String initSql = """
+            CREATE TABLE foos(
+                id INTEGER PRIMARY KEY NOT NULL
+                );
+            """;
+        var statement1 = storage.connection.createStatement();
+        statement1.execute(initSql);
+        System.out.println("I ran init.sql");
+
+
+        var sql = """
+            SELECT id FROM foos
+            """;
+        var statement = storage.connection.prepareStatement(sql);
+        var resultSet = statement.executeQuery();
+
     }
 
     @Test
-    void insert_account() {
+    void read_foos2() throws SQLException {
+        var storage = new Storage("jdbc:sqlite::memory:");
+        storage.reInit();
+
+        var sql = """
+            SELECT id FROM foos
+            """;
+        var statement = storage.connection.prepareStatement(sql);
+        var resultSet = statement.executeQuery();
+
+    }
+
+    @Test
+    void insert_account() throws SQLException {
+        var storage = inMemory();
         var account = new AccountCreationRequest("bob", "bob@domain.tld");
+        storage.readFoos();
+
+        /*
         storage.createAccount(account);
 
         var found = storage.getAccountByUserName("bob");
         assertThat(found.username()).isEqualTo("bob");
         assertThat(found.email()).isEqualTo("bob@domain.tld");
+
+         */
     }
 
     @Test
     void get_account_by_id() {
+        var storage = inMemory();
+
         var request = new AccountCreationRequest("bob", "bob@domain.tld");
         var account = storage.createAccount(request);
 
@@ -41,6 +78,8 @@ public class StorageTests {
 
     @Test
     void get_huddle_by_date() {
+        var storage = inMemory();
+
         var request = new HuddleScheduleRequest("2023-04-18 AM", "Learning TDD");
         storage.scheduleHuddle(request);
 
@@ -50,6 +89,8 @@ public class StorageTests {
 
     @Test
     void get_huddle_by_id() {
+        var storage = inMemory();
+
         var request = new HuddleScheduleRequest("2023-04-18 AM", "Learning TDD");
         var huddle = storage.scheduleHuddle(request);
 
@@ -59,6 +100,8 @@ public class StorageTests {
 
     @Test
     void register_participant_to_huddle() {
+        var storage = inMemory();
+
         var learningTdd = storage.scheduleHuddle(new HuddleScheduleRequest("2023-04-18 AM", "Learning TDD"));
         var alice = storage.createAccount(new AccountCreationRequest("Alice", "alice@acme.corp"));
         var bob = storage.createAccount(new AccountCreationRequest("bob", "bob@domain.tld"));
