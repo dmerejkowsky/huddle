@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlStorage {
+public class SqlStorage implements Storage {
     public final Connection connection;
     public final String url;
 
@@ -29,6 +29,7 @@ public class SqlStorage {
     }
 
 
+    @Override
     public void reset() {
         var flyway = getFlyway();
         flyway.clean();
@@ -41,6 +42,7 @@ public class SqlStorage {
     }
 
 
+    @Override
     public Account createAccount(AccountCreationRequest request) {
         try {
             var sql = """
@@ -57,6 +59,7 @@ public class SqlStorage {
         return getAccountByUserName(request.username());
     }
 
+    @Override
     public Account getAccountById(int id) {
         try {
             var sql = """
@@ -76,6 +79,7 @@ public class SqlStorage {
         }
     }
 
+    @Override
     public Account getAccountByUserName(String username) {
         ResultSet resultSet;
         try {
@@ -97,6 +101,7 @@ public class SqlStorage {
         }
     }
 
+    @Override
     public Huddle scheduleHuddle(HuddleScheduleRequest request) {
         try {
             var sql = """
@@ -113,6 +118,7 @@ public class SqlStorage {
         return getHuddleByDate(request.date());
     }
 
+    @Override
     public Huddle getHuddleByDate(String date) {
         try {
             var sql = """
@@ -132,6 +138,7 @@ public class SqlStorage {
         }
     }
 
+    @Override
     public Huddle getHuddleById(int id) {
         try {
             var sql = """
@@ -151,6 +158,7 @@ public class SqlStorage {
         }
     }
 
+    @Override
     public void registerParticipant(int accountId, int huddleId) {
         try {
             var sql = """
@@ -166,6 +174,7 @@ public class SqlStorage {
         }
     }
 
+    @Override
     public List<Integer> getParticipantsForHuddle(int huddleId) {
         List<Integer> res = new ArrayList<>();
 
@@ -187,6 +196,7 @@ public class SqlStorage {
         return res;
     }
 
+    @Override
     public List<Account> getAllAccounts() {
         var res = new ArrayList<Account>();
         try {

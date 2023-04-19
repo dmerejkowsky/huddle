@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController()
 public class Controller {
-    private final SqlStorage storage;
+    private final Storage storage;
 
     public Controller(SqlStorage storage) {
         this.storage = storage;
