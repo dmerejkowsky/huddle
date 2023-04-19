@@ -152,7 +152,7 @@ public class SqlStorage implements Storage {
     }
 
     @Override
-    public void registerParticipant(Account account, Huddle huddle) {
+    public Participant registerParticipant(Account account, Huddle huddle) {
         try {
             var sql = """
                 INSERT INTO participants(account_id, huddle_id)
@@ -165,6 +165,7 @@ public class SqlStorage implements Storage {
         } catch (SQLException e) {
             throw new RuntimeException("When inserting participants: " + e);
         }
+        return new Participant(account, huddle);
     }
 
     @Override

@@ -18,7 +18,7 @@ public interface Storage {
 
     Huddle getHuddleById(int id);
 
-    void registerParticipant(Account account, Huddle huddle);
+    Participant registerParticipant(Account account, Huddle huddle);
 
     List<Participant> getParticipantsForHuddle(Huddle huddle);
 

@@ -83,9 +83,10 @@ public class FakeStorage implements Storage {
     }
 
     @Override
-    public void registerParticipant(Account account, Huddle huddle) {
+    public Participant registerParticipant(Account account, Huddle huddle) {
         int[] tuple = new int[]{account.id(), huddle.id()};
         participants.add(tuple);
+        return new Participant(account, huddle);
     }
 
     @Override
