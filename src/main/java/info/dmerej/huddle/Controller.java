@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController()
 public class Controller {
     private final SqlStorage storage;
@@ -34,5 +36,10 @@ public class Controller {
     @PostMapping(path = "/reset-db")
     public void resetDb() {
         storage.reset();
+    }
+
+    @GetMapping(path = "/accounts")
+    public List<Account> listAccounts() {
+        return storage.getAllAccounts();
     }
 }

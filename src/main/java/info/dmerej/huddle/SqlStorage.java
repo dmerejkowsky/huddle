@@ -36,7 +36,7 @@ public class SqlStorage {
     }
 
     private Flyway getFlyway() {
-        Flyway flyway = Flyway.configure().locations("filesystem:db/migration/").dataSource(this.url, "", "").load();
+        Flyway flyway = Flyway.configure().locations("filesystem:src/main/resources/db/migration/").dataSource(this.url, "", "").load();
         return flyway;
     }
 

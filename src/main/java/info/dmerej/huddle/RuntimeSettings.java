@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Configuration;
 public class RuntimeSettings {
     @Bean("storage")
     public SqlStorage getStorage() {
-        String url = "jdbc:h2:filesystem:./hudde.h2";
+        // NOTE: keep this consistent with flyway.conf
+        String url = "jdbc:h2:~/.cache/huddle.h2";
         return new SqlStorage(url);
     }
 }

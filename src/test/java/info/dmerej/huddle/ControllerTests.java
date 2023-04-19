@@ -12,10 +12,12 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 @SpringBootTest
 class ControllerTests {
     private final SqlStorage storage = SqlStorageTests.inMemory();
+    private Controller controller;
 
     @BeforeEach
     void setUp() {
         storage.reset();
+        controller = new Controller(storage);
     }
 
     @Test
@@ -24,8 +26,6 @@ class ControllerTests {
 
     @Test
     void register_account() {
-        var controller = new Controller(storage);
-
         var exception = catchThrowableOfType(
             () -> controller.get("bob"),
             ResponseStatusException.class);
@@ -37,4 +37,15 @@ class ControllerTests {
         var found = controller.get("bob");
         assertThat(found.username()).isEqualTo("bob");
     }
+
+    @Test
+    void register_account_then_list_it() {
+        var account = new AccountCreationRequest("bob", "bob@domain.tdl");
+        controller.createAccount(account);
+
+        var returned = controller.listAccounts();
+        assertThat(returned).hasSize(1);
+    }
+
+
 }
