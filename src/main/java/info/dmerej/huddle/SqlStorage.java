@@ -23,11 +23,6 @@ public class SqlStorage implements Storage {
         this.url = url;
     }
 
-    public void migrate() {
-        var flyway = getFlyway();
-        flyway.migrate();
-    }
-
 
     @Override
     public void reset() {
@@ -37,26 +32,28 @@ public class SqlStorage implements Storage {
     }
 
     private Flyway getFlyway() {
-        Flyway flyway = Flyway.configure().locations("filesystem:src/main/resources/db/migration/").dataSource(this.url, "", "").load();
-        return flyway;
+        return Flyway.configure()
+            .locations("filesystem:src/main/resources/db/migration/")
+            .dataSource(this.url, "", "")
+            .load();
     }
 
 
     @Override
-    public Account createAccount(AccountCreationRequest request) {
+    public Account createAccount(Identity identity) {
         try {
             var sql = """
                 INSERT INTO accounts(username, email)
                 VALUES(?, ?)
                 """;
             var statement = connection.prepareStatement(sql);
-            statement.setString(1, request.username());
-            statement.setString(2, request.email());
+            statement.setString(1, identity.username());
+            statement.setString(2, identity.email());
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException("When inserting account: " + e);
         }
-        return getAccountByUserName(request.username());
+        return getAccountByUserName(identity.username());
     }
 
     @Override
@@ -69,8 +66,7 @@ public class SqlStorage implements Storage {
             statement.setInt(1, id);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                var account = new Account(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
-                return account;
+                return new Account(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
             } else {
                 throw new NoSuchAccount(String.format("No account found for id '%d'", id));
             }
@@ -90,8 +86,7 @@ public class SqlStorage implements Storage {
             statement.setString(1, username);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                var account = new Account(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
-                return account;
+                return new Account(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
             } else {
                 throw new NoSuchAccount(String.format("No account found for username '%s'", username));
             }
@@ -102,20 +97,20 @@ public class SqlStorage implements Storage {
     }
 
     @Override
-    public Huddle scheduleHuddle(HuddleScheduleRequest request) {
+    public Huddle scheduleHuddle(HuddleAnnounce announce) {
         try {
             var sql = """
                 INSERT INTO huddles(date, title)
                 VALUES(?, ?)
                 """;
             var statement = connection.prepareStatement(sql);
-            statement.setString(1, request.date());
-            statement.setString(2, request.title());
+            statement.setString(1, announce.date());
+            statement.setString(2, announce.title());
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException("When inserting huddle: " + e);
         }
-        return getHuddleByDate(request.date());
+        return getHuddleByDate(announce.date());
     }
 
     @Override
@@ -128,8 +123,7 @@ public class SqlStorage implements Storage {
             statement.setString(1, date);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                var huddle = new Huddle(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
-                return huddle;
+                return new Huddle(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
             } else {
                 throw new NoSuchHuddle(String.format("No huddle found for date '%s'", date));
             }
@@ -148,8 +142,7 @@ public class SqlStorage implements Storage {
             statement.setInt(1, id);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                var huddle = new Huddle(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
-                return huddle;
+                return new Huddle(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3));
             } else {
                 throw new NoSuchHuddle(String.format("No huddle found with id '%d'", id));
             }
@@ -175,25 +168,25 @@ public class SqlStorage implements Storage {
     }
 
     @Override
-    public List<Integer> getParticipantsForHuddle(int huddleId) {
-        List<Integer> res = new ArrayList<>();
+    public List<Participant> getParticipantsForHuddle(Huddle huddle) {
+        List<Integer> ids = new ArrayList<>();
 
         try {
             var sql = """
                 SELECT account_id FROM participants WHERE huddle_id = ?
                 """;
             var statement = connection.prepareStatement(sql);
-            statement.setInt(1, huddleId);
+            statement.setInt(1, huddle.id());
             var resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 var id = resultSet.getInt(1);
-                res.add(id);
+                ids.add(id);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(String.format("When looking for huddle with id %d : %s", huddleId, e));
+            throw new RuntimeException(String.format("When looking for huddle with id %d : %s", huddle.id(), e));
         }
 
-        return res;
+        return ids.stream().map(this::getAccountById).map(account -> new Participant(account, huddle)).toList();
     }
 
     @Override

@@ -31,7 +31,7 @@ class ControllerTests {
             ResponseStatusException.class);
         assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
-        var account = new AccountCreationRequest("bob", "bob@domain.tdl");
+        var account = new Identity("bob", "bob@domain.tdl");
         controller.createAccount(account);
 
         var found = controller.get("bob");
@@ -40,7 +40,7 @@ class ControllerTests {
 
     @Test
     void register_account_then_list_it() {
-        var account = new AccountCreationRequest("bob", "bob@domain.tdl");
+        var account = new Identity("bob", "bob@domain.tdl");
         controller.createAccount(account);
 
         var returned = controller.listAccounts();

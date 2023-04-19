@@ -6,13 +6,13 @@ public interface Storage {
 
     void reset();
 
-    Account createAccount(AccountCreationRequest request);
+    Account createAccount(Identity identity);
 
     Account getAccountById(int id);
 
     Account getAccountByUserName(String username);
 
-    Huddle scheduleHuddle(HuddleScheduleRequest request);
+    Huddle scheduleHuddle(HuddleAnnounce announce);
 
     Huddle getHuddleByDate(String date);
 
@@ -20,7 +20,7 @@ public interface Storage {
 
     void registerParticipant(int accountId, int huddleId);
 
-    List<Integer> getParticipantsForHuddle(int huddleId);
+    List<Participant> getParticipantsForHuddle(Huddle huddle);
 
     List<Account> getAllAccounts();
 }

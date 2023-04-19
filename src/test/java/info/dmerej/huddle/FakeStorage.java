@@ -24,10 +24,10 @@ public class FakeStorage implements Storage {
     }
 
     @Override
-    public Account createAccount(AccountCreationRequest request) {
+    public Account createAccount(Identity identity) {
         var maxId = accounts.keySet().stream().max(Comparator.naturalOrder()).orElse(0);
         var id = maxId + 1;
-        var account = new Account(id, request.username(), request.email());
+        var account = new Account(id, identity.username(), identity.email());
         accounts.put(id, account);
         return account;
     }
@@ -56,10 +56,10 @@ public class FakeStorage implements Storage {
     }
 
     @Override
-    public Huddle scheduleHuddle(HuddleScheduleRequest request) {
+    public Huddle scheduleHuddle(HuddleAnnounce announce) {
         var maxId = huddles.keySet().stream().max(Comparator.naturalOrder()).orElse(0);
         var id = maxId + 1;
-        var huddle = new Huddle(id, request.date(), request.title());
+        var huddle = new Huddle(id, announce.date(), announce.title());
         huddles.put(id, huddle);
         return huddle;
     }
@@ -89,7 +89,8 @@ public class FakeStorage implements Storage {
     }
 
     @Override
-    public List<Integer> getParticipantsForHuddle(int huddleId) {
-        return participants.stream().filter(t -> t[1] == huddleId).map(t -> t[0]).toList();
+    public List<Participant> getParticipantsForHuddle(Huddle huddle) {
+        var ids = participants.stream().filter(t -> t[1] == huddle.id()).map(t -> t[0]);
+        return ids.map(this::getAccountById).map(account -> new Participant(account, huddle)).toList();
     }
 }

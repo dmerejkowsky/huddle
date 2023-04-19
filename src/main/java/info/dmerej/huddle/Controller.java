@@ -26,8 +26,8 @@ public class Controller {
     }
 
     @PostMapping(path = "/account")
-    public void createAccount(@RequestBody AccountCreationRequest account) {
-        storage.createAccount(account);
+    public void createAccount(@RequestBody Identity identity) {
+        storage.createAccount(identity);
     }
 
     /**
