@@ -75,7 +75,7 @@ public abstract class AbstractStorageTest {
         var alice = storage.createAccount(new Identity("Alice", "alice@acme.corp"));
         var bob = storage.createAccount(new Identity("bob", "bob@domain.tld"));
 
-        storage.registerParticipant(bob.id(), learningTdd.id());
+        storage.registerParticipant(bob, learningTdd);
 
         var participants = storage.getParticipantsForHuddle(learningTdd);
         assertThat(participants.size()).isEqualTo(1);

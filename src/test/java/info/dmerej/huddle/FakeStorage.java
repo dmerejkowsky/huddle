@@ -13,7 +13,7 @@ public class FakeStorage implements Storage {
     public FakeStorage() {
         accounts = new HashMap<>();
         huddles = new HashMap<>();
-        participants = new ArrayList<>();
+        participants = new ArrayList<int[]>();
     }
 
     @Override
@@ -83,8 +83,8 @@ public class FakeStorage implements Storage {
     }
 
     @Override
-    public void registerParticipant(int accountId, int huddleId) {
-        var tuple = new int[]{accountId, huddleId};
+    public void registerParticipant(Account account, Huddle huddle) {
+        int[] tuple = new int[]{account.id(), huddle.id()};
         participants.add(tuple);
     }
 

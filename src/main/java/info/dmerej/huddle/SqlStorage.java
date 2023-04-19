@@ -152,15 +152,15 @@ public class SqlStorage implements Storage {
     }
 
     @Override
-    public void registerParticipant(int accountId, int huddleId) {
+    public void registerParticipant(Account account, Huddle huddle) {
         try {
             var sql = """
                 INSERT INTO participants(account_id, huddle_id)
                 VALUES(?, ?)
                 """;
             var statement = connection.prepareStatement(sql);
-            statement.setInt(1, accountId);
-            statement.setInt(2, huddleId);
+            statement.setInt(1, account.id());
+            statement.setInt(2, huddle.id());
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException("When inserting participants: " + e);
