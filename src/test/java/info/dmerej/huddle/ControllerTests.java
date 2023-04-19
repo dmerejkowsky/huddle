@@ -1,5 +1,6 @@
 package info.dmerej.huddle;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,12 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 @SpringBootTest
 class ControllerTests {
+    private final SqlStorage storage = SqlStorageTests.inMemory();
+
+    @BeforeEach
+    void setUp() {
+        storage.reset();
+    }
 
     @Test
     void context_loads() {
@@ -17,7 +24,6 @@ class ControllerTests {
 
     @Test
     void register_account() {
-        var storage = StorageTests.inMemory();
         var controller = new Controller(storage);
 
         var exception = catchThrowableOfType(

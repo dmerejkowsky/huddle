@@ -1,54 +1,45 @@
 package info.dmerej.huddle;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.flywaydb.core.Flyway;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class Storage {
+public class SqlStorage {
     public final Connection connection;
+    public final String url;
 
-    public Storage(String url) {
+    public SqlStorage(String url) {
         try {
             connection = DriverManager.getConnection(url);
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RuntimeException("When connecting: " + e);
         }
+        this.url = url;
     }
 
-    private static String readInitSql() {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        InputStream is = classLoader.getResourceAsStream("init.sql");
-        if (is == null) {
-            throw new RuntimeException("Could not migrate - resource 'init.sql' not found");
-        }
-        var reader = new InputStreamReader(is);
-        var bufferedReader = new BufferedReader(reader);
-        var sql = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-        return sql;
+    public void migrate() {
+        var flyway = getFlyway();
+        flyway.migrate();
     }
 
-    public void reInit() {
-        System.out.format("reInit(): Using connection %s\n", connection.toString());
-        String initSql = readInitSql();
-        try {
-            var statement = connection.createStatement();
-            statement.execute(initSql);
-            statement.execute("""
-                    INSERT INTO foos(BAR) VALUES ("pouet");
-                """);
-            connection.commit();
-        } catch (SQLException e) {
-            throw new RuntimeException("When running init.sql: " + e);
-        }
+
+    public void reset() {
+        var flyway = getFlyway();
+        flyway.clean();
+        flyway.migrate();
     }
+
+    private Flyway getFlyway() {
+        Flyway flyway = Flyway.configure().locations("filesystem:db/migration/").dataSource(this.url, "", "").load();
+        return flyway;
+    }
+
 
     public Account createAccount(AccountCreationRequest request) {
         try {
@@ -196,19 +187,21 @@ public class Storage {
         return res;
     }
 
-    public List<String> readFoos() throws SQLException {
-        var res = new ArrayList<String>();
-        System.out.format("readFoos(): using connection %s\n", connection.toString());
-
-        var sql = """
-            SELECT bar FROM foos
-            """;
-        var statement = connection.prepareStatement(sql);
-        var resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            res.add(resultSet.getString(1));
+    public List<Account> getAllAccounts() {
+        var res = new ArrayList<Account>();
+        try {
+            var sql = """
+                SELECT id, username, email FROM accounts
+                """;
+            var statement = connection.prepareStatement(sql);
+            var resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                var account = new Account(resultSet.getInt("id"), resultSet.getString("username"), resultSet.getString("email"));
+                res.add(account);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(String.format("When fetching account: %s", e));
         }
-
         return res;
     }
 }

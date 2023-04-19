@@ -4,10 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RuntimeConfiguration {
+public class RuntimeSettings {
     @Bean("storage")
-    public Storage getStorage() {
-        String url = "jdbc:sqlite:huddle.sqlite";
-        return new Storage(url);
+    public SqlStorage getStorage() {
+        String url = "jdbc:h2:filesystem:./hudde.h2";
+        return new SqlStorage(url);
     }
 }

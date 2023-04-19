@@ -6,9 +6,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController()
 public class Controller {
-    private final Storage storage;
+    private final SqlStorage storage;
 
-    public Controller(Storage storage) {
+    public Controller(SqlStorage storage) {
         this.storage = storage;
     }
 
@@ -26,5 +26,13 @@ public class Controller {
     @PostMapping(path = "/account")
     public void createAccount(@RequestBody AccountCreationRequest account) {
         storage.createAccount(account);
+    }
+
+    /**
+     * Reset the DB - just for the tests :)
+     */
+    @PostMapping(path = "/reset-db")
+    public void resetDb() {
+        storage.reset();
     }
 }
