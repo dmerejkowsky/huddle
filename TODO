@@ -4,3 +4,5 @@
 * Port interesting domain tests to ControllerTests and EndToEndTests
 
 * Transform this into a proper kata with instructions
+
+* Builder pattern in tests (yet again)
