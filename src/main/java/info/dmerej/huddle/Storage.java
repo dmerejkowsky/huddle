@@ -25,4 +25,6 @@ public interface Storage {
     List<Account> getAllAccounts();
 
     List<Huddle> getAllHuddles();
+
+    List<Huddle> attendedBy(Account account);
 }

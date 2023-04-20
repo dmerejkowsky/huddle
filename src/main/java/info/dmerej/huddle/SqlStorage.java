@@ -153,7 +153,41 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Huddle> getAllHuddles() {
-        return null;
+        var res = new ArrayList<Huddle>();
+        try {
+            var sql = """
+                SELECT id, date, title FROM huddles
+                """;
+            var statement = connection.prepareStatement(sql);
+            var resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                var huddle = new Huddle(resultSet.getInt("id"), resultSet.getString("date"), resultSet.getString("title"));
+                res.add(huddle);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(String.format("When getting all huddles", e));
+        }
+        return res;
+    }
+
+    @Override
+    public List<Huddle> attendedBy(Account account) {
+        var res = new ArrayList<Huddle>();
+        try {
+            var sql = """
+                SELECT account_id, huddle_id FROM participants WHERE account_id = ?
+                """;
+            var statement = connection.prepareStatement(sql);
+            statement.setInt(1, account.id());
+            var resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                var huddleId = resultSet.getInt("huddle_id");
+                res.add(getHuddleById(huddleId));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(String.format("When getting all huddles", e));
+        }
+        return res;
     }
 
     @Override

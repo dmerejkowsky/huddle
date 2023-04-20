@@ -84,7 +84,13 @@ public class FakeStorage implements Storage {
 
     @Override
     public List<Huddle> getAllHuddles() {
-        return null;
+        return huddles.values().stream().toList();
+    }
+
+    @Override
+    public List<Huddle> attendedBy(Account account) {
+        var ids = participants.stream().filter(t -> t[0] == account.id()).map(t -> t[1]);
+        return ids.map(this::getHuddleById).toList();
     }
 
     @Override

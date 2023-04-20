@@ -70,6 +70,16 @@ public abstract class AbstractStorageTest {
     }
 
     @Test
+    void get_all_huddles() {
+        storage.scheduleHuddle(new HuddleAnnounce("2023-04-18 AM", "Learning TDD"));
+        storage.scheduleHuddle(new HuddleAnnounce("2023-05-18 AM", "Learning Kotlin"));
+
+        var huddles = storage.getAllHuddles();
+
+        assertThat(huddles.stream().map(h -> h.title())).containsExactly("Learning TDD", "Learning Kotlin");
+    }
+
+    @Test
     void register_participant_to_huddle() {
         var learningTdd = storage.scheduleHuddle(new HuddleAnnounce("2023-04-18 AM", "Learning TDD"));
         var alice = storage.createAccount(new Identity("Alice", "alice@acme.corp"));
@@ -81,6 +91,17 @@ public abstract class AbstractStorageTest {
         assertThat(participants.size()).isEqualTo(1);
         var bobAccount = participants.get(0).account();
         assertThat(bobAccount.username()).isEqualTo("bob");
+    }
+
+    void get_participation() {
+        var learningTdd = storage.scheduleHuddle(new HuddleAnnounce("2023-04-18 AM", "Learning TDD"));
+        var learningKotlin = storage.scheduleHuddle(new HuddleAnnounce("2023-04-18 AM", "Learning Kotlin"));
+
+        var bob = storage.createAccount(new Identity("bob", "bob@domain.tld"));
+        storage.registerParticipant(bob, learningTdd);
+
+        var huddles = storage.attendedBy(bob);
+        assertThat(huddles.stream().map(h -> h.title())).containsExactly("Learning TDD");
     }
 
 }
