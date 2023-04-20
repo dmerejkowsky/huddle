@@ -152,6 +152,11 @@ public class SqlStorage implements Storage {
     }
 
     @Override
+    public List<Huddle> getAllHuddles() {
+        return null;
+    }
+
+    @Override
     public Participant registerParticipant(Account account, Huddle huddle) {
         try {
             var sql = """

@@ -23,4 +23,6 @@ public interface Storage {
     List<Participant> getParticipantsForHuddle(Huddle huddle);
 
     List<Account> getAllAccounts();
+
+    List<Huddle> getAllHuddles();
 }
