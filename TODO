@@ -1,0 +1,6 @@
+* Use Date for dates, not Strings
+* Use Hibernate
+
+* Port interesting domain tests to ControllerTests and EndToEndTests
+
+* Transform this into a proper kata with instructions
