@@ -13,9 +13,8 @@ public class Calendar {
         storage.scheduleHuddle(announce);
     }
 
-    public List<Huddle> pastHuddles() {
-        var allHuddles = storage.getAllHuddles();
-        return allHuddles.stream().filter(h -> h.date().compareTo("2022-01-01") < 0).toList();
+    public List<Huddle> allHuddles() {
+        return storage.getAllHuddles();
     }
 
     public List<Participant> firstTimeParticipants(Huddle huddle) {
