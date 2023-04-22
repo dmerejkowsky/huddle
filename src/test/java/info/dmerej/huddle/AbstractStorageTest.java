@@ -76,7 +76,7 @@ public abstract class AbstractStorageTest {
 
         var huddles = storage.getAllHuddles();
 
-        assertThat(huddles.stream().map(h -> h.title())).containsExactly("Learning TDD", "Learning Kotlin");
+        assertThat(huddles.stream().map(Huddle::title)).containsExactly("Learning TDD", "Learning Kotlin");
     }
 
     @Test

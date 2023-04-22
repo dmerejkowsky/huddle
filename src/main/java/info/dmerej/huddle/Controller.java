@@ -15,7 +15,7 @@ public class Controller {
     }
 
     @GetMapping(path = "/account/{username}")
-    public Account get(@PathVariable String username) {
+    public Account getAccountByUserName(@PathVariable String username) {
         Account result;
         try {
             result = storage.getAccountByUserName(username);

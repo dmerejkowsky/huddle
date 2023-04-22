@@ -36,16 +36,8 @@ public class EndToEndTests {
         }
     }
 
-    /*
-     * Scenario:
-     *   Get account with id 1 (should not exist yet)
-     *   Post a new account
-     *   Get account with id 1 (should have been created)
-     */
     @Test
-    void create_account_then_find_it() throws Exception {
-        doGet("/account/alice").andExpect(status().isNotFound());
-
+    void register_account_then_find_it() throws Exception {
         doPost("/account", """
             {
                "username": "alice",

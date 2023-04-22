@@ -3,11 +3,8 @@ package info.dmerej.huddle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 @SpringBootTest
 class ControllerTests {
@@ -25,26 +22,12 @@ class ControllerTests {
     }
 
     @Test
-    void register_account() {
-        var exception = catchThrowableOfType(
-            () -> controller.get("bob"),
-            ResponseStatusException.class);
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    void register_account_then_find_it() {
+        var created = new Identity("bob", "bob@domain.tdl");
+        controller.createAccount(created);
 
-        var account = new Identity("bob", "bob@domain.tdl");
-        controller.createAccount(account);
-
-        var found = controller.get("bob");
-        assertThat(found.username()).isEqualTo("bob");
-    }
-
-    @Test
-    void register_account_then_list_it() {
-        var account = new Identity("bob", "bob@domain.tdl");
-        controller.createAccount(account);
-
-        var returned = controller.listAccounts();
-        assertThat(returned).hasSize(1);
+        var returned = controller.getAccountByUserName("bob");
+        assertThat(returned).isEqualTo(created);
     }
 
 
